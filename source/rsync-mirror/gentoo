@@ -1,0 +1,10 @@
+RSYNC_HOST=mirrors6.tuna.tsinghua.edu.cn
+RSYNC_DIR=gentoo/
+#RSYNC_HOST=mirrors.kernel.org
+#RSYNC_DIR=mirrors/gentoo/
+TO=gentoo/
+RSYNC_OPTS=-av
+
+EXCLUDE="--include /releases/x86/ --include /releases/amd64/ \
+         --exclude /releases/ --exclude /experimental/ --exclude /grp/ \
+         --exclude /gentoo-portage/ --exclude /gentoo-x86-portage/"

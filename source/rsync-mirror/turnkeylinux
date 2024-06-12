@@ -1,0 +1,5 @@
+# RSYNC_HOST=ftp.heanet.ie
+# RSYNC_DIR=mirrors/sourceforge/t/project/tu/turnkeylinux/
+RSYNC_HOST=rsync.mirrors.ustc.edu.cn
+RSYNC_DIR=turnkeylinux/
+RSYNC_DELETE_EXCLUDE=yes

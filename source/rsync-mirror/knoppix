@@ -1,0 +1,8 @@
+RSYNC_HOST=ftp.uni-kl.de
+RSYNC_DIR=pub/linux/knoppix/
+EXCLUDE="--exclude '/DVD' \
+         --exclude '*-DE.iso*'"
+#         --include 'KNOPPIX_V5.1.1*' \
+#         --include 'KNOPPIX_V6.*' \
+#         --exclude 'KNOPPIX_*iso*'"
+RSYNC_DELETE_EXCLUDE=yes

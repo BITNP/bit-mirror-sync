@@ -1,0 +1,4 @@
+RSYNC_HOST=rsync.mirrors.ustc.edu.cn
+RSYNC_DIR=rubygems/
+RSYNC_OPTS="-avH"
+#EXCLUDE="--exclude '/gems/'"

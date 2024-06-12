@@ -1,0 +1,10 @@
+#RSYNC_HOST=linux.mirrors.es.net
+#RSYNC_DIR=fedora/linux/
+TO=fedora/linux/
+RSYNC_HOST=rsync.mirrors.ustc.edu.cn
+RSYNC_DIR=fedora/
+RSYNC_OPTS=-av6
+
+EXCLUDE="--exclude .rsync.log"
+# --exclude /core/ --exclude /development/ --exclude /extras/"
+#RSYNC_DELETE_EXCLUDE=yes

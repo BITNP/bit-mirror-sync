@@ -1,0 +1,7 @@
+RSYNC_HOST=mirrors6.tuna.tsinghua.edu.cn
+#RSYNC_HOST=mirror.chaoticum.net
+#RSYNC_HOST=rsync.mirrors.ustc.edu.cn
+RSYNC_DIR=archlinux/
+TO=archlinux/
+#WGET_URL=http://ftp.sjtu.edu.cn/sites/www.archlinux.org/
+#WGET_CUT_DIRS=2

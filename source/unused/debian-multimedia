@@ -1,0 +1,15 @@
+RSYNC_HOST=www.debian-multimedia.org
+RSYNC_DIR=debian/
+RSYNC_OPTS="-av"
+
+PATTERN="*_\$arch.deb *_\$arch.udeb binary-\$arch/ arch-\$arch.* Contents-\$arch* installer-\$arch/"
+EXCLUDEARCH="alpha armel arm hppa hurd-i386 ia64 m68k mipsel mips powerpc s390 sparc"
+
+EXCLUDE=""
+for arch in $EXCLUDEARCH ; do
+    for pattern in $PATTERN ; do
+        eval "e=$pattern"
+        EXCLUDE="$EXCLUDE --exclude '$e'"
+    done
+done
+RSYNC_DELETE_EXCLUDE=yes

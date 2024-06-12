@@ -1,0 +1,198 @@
+#!/bin/bash
+
+##
+## This is the official eclipse.org mirror site script.
+##
+## Set your options and run once manually, then as a cronjob - preferably not as root
+##
+## Last updated: 2006-03-14 by webmaster@eclipse.org
+##
+
+##
+## User-defined options
+
+# Set the base path for your mirror site here
+# No ending /
+mirror_path=~/public_html/eclipse
+
+# path to your RSYNC binary
+RSYNC=/usr/bin/rsync
+
+# Lockfile location - prevents rsync script from re-spawning
+LOCKFILE="$mirror_path/eclipse_lockfile"
+
+RSYNC_LOG=~/log/eclipse.log
+RSYNC_OPTS="--stats --delete --delete-after -P --inplace \
+            --exclude '*ia64*' --exclude '*hpux*' \
+            --exclude '*motif*' --exclude '*solaris*'"
+
+# if you rsync from Europe, you can use these.  Comment the master server options above
+# RSYNC_HOST=rsync.mirrorservice.org  # UK server - for European mirrors 
+# RSYNC_PATH=download.eclipse.org/eclipseMirror  # use with www.mirrorservice.org
+
+# if you rsync from North America or Asia, you can use these.  Comment the master server options above
+RSYNC_HOST=192.168.127.1:1874 # Oregon State University - North America and Asia
+RSYNC_PATH=mirrors/eclipse    # use with rsync.osuosl.org
+
+# Select the content you want to mirror.
+# Please see http://eclipse.org/downloads for information on the space requirements.
+
+RSYNC_SOURCE=rsync://$RSYNC_HOST/$RSYNC_PATH
+
+##################
+#
+# IMPORTANT: if you change the content you mirror, please advise the
+# webmaster@eclipse.org.  Thank you.
+#
+##################
+
+# full_eclipse is a complete eclipse.org mirror.  
+# Set all other options to 'no' if you say yes here.
+full_eclipse=no
+
+# full_patform is the Eclipse Platform project.
+# It includes Stable, Release, Nightly, Maintenance and Integration build.
+# it doesn't include any other project (tools, webtools, technology, birt, etc)
+full_platform=no
+
+# Eclipse Platform - Release builds only.  Say no here if you said yes to full_platform or full_eclipse.
+# This is what most people want.
+platform_release=yes
+
+# Eclipse Platform - Stable builds only.  Say no here if you said yes to full_platform or full_eclipse.
+# This is what most people want.
+platform_stable=yes
+
+# Eclipse Platform - Update jars only.  Say no here if you said yes to full_platform or full_eclipse.
+# This is what most people want.
+platform_update=yes
+
+# Callisto Simultaneous Release. This will be a high-demand item. Say no here if you said yes to full_eclipse.
+# This is what most people want.
+callisto=yes
+
+
+# BIRT project
+full_birt=yes
+
+# technology Project
+full_technology=yes
+
+# Tools project.
+full_tools=yes
+
+# Testing and Performance Tools Project (TPTP)
+full_tptp=yes
+
+# Webtools project.
+full_webtools=yes
+
+# Datatools project.
+full_datatools=yes
+
+## End: User-defined options
+##
+
+
+
+#
+## Contributed by Gabriel Akos 2005-10-14
+#host $RSYNC_HOST > /dev/null
+#hres=$?
+#if [ $hres -ne 0 ]; then
+#	echo "Eclipse mirror - host $RSYNC_HOST resolution failed" >/dev/stderr
+#	exit 1
+#fi
+
+
+#if [ -e $LOCKFILE ]; then
+#	echo "Eclipse mirror - Lockfile $LOCKFILE exists" >/dev/stderr
+#	exit 1
+#fi
+#touch $LOCKFILE
+
+## END: Contributed by Gabriel Akos 2005-10-14
+#
+
+
+
+# required "mirror root" timestamp.
+# All mirror sites must get this.
+$RSYNC -rtlv $RSYNC_SOURCE/TIME $mirror_path >> $RSYNC_LOG 2>&1
+if [ $? -ne 0 ]; then exit $?; fi
+
+if [ $full_eclipse == yes ]; then
+	$RSYNC -rtlv $RSYNC_OPTS $RSYNC_SOURCE/* $mirror_path >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi 
+
+if [ $full_platform == yes ] ; then
+	$RSYNC -rtlv $RSYNC_OPTS $RSYNC_SOURCE/eclipse/* $mirror_path/eclipse/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi
+
+if [ $platform_release == yes -o $platform_stable == yes -o $platform_update == yes ]; then
+	$RSYNC -dtlv $RSYNC_OPTS $RSYNC_SOURCE/eclipse/* $mirror_path/eclipse/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+	$RSYNC -dtlv $RSYNC_OPTS $RSYNC_SOURCE/eclipse/downloads/* $mirror_path/eclipse/downloads/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+	$RSYNC -dtlv $RSYNC_OPTS $RSYNC_SOURCE/eclipse/images/* $mirror_path/eclipse/images/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+	$RSYNC -dtlv $RSYNC_OPTS $RSYNC_SOURCE/eclipse/downloads/drops/* $mirror_path/eclipse/downloads/drops/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi
+
+if [ $platform_release == yes ]; then
+	$RSYNC -rtlv $RSYNC_OPTS $RSYNC_SOURCE/eclipse/downloads/drops/R-* $mirror_path/eclipse/downloads/drops/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi
+
+if [ $platform_stable == yes ]; then
+	$RSYNC -rtlv $RSYNC_OPTS $RSYNC_SOURCE/eclipse/downloads/drops/S-* $mirror_path/eclipse/downloads/drops/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi
+
+if [ $platform_update == yes ]; then
+	$RSYNC -rtlv $RSYNC_OPTS $RSYNC_SOURCE/eclipse/updates/ $mirror_path/eclipse/updates/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi
+
+if [ $callisto == yes ]; then
+	$RSYNC -rtlv $RSYNC_OPTS $RSYNC_SOURCE/callisto/* $mirror_path/callisto/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi
+
+
+if [ $full_birt == yes ]; then
+	$RSYNC -rtlv $RSYNC_OPTS $RSYNC_SOURCE/birt/* $mirror_path/birt/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi
+
+if [ $full_technology == yes ]; then
+	$RSYNC -rtlv $RSYNC_OPTS $RSYNC_SOURCE/technology/* $mirror_path/technology/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi
+
+if [ $full_tools == yes ]; then
+	$RSYNC -rtlv $RSYNC_OPTS $RSYNC_SOURCE/tools/* $mirror_path/tools/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi
+
+if [ $full_tptp == yes ]; then
+	$RSYNC -rtlv $RSYNC_OPTS $RSYNC_SOURCE/tptp/* $mirror_path/tptp/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi
+
+if [ $full_webtools == yes ]; then
+	$RSYNC -rtlv $RSYNC_OPTS $RSYNC_SOURCE/webtools/* $mirror_path/webtools/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi
+
+if [ $full_datatools == yes ]; then
+	$RSYNC -rtlv $RSYNC_OPTS $RSYNC_SOURCE/datatools/* $mirror_path/datatools/ >> $RSYNC_LOG 2>&1
+    if [ $? -ne 0 ]; then exit $?; fi
+fi
+
+#rm $LOCKFILE
+
+savelog $RSYNC_LOG > /dev/null 2>&1

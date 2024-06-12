@@ -1,0 +1,2 @@
+RSYNC_HOST=rsync.mirrors.ustc.edu.cn
+RSYNC_DIR=lfs/

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+SRC=$1
+DEST=$2
+
+d=`dirname $2`
+[ -d "$d" ] || mkdir -p $d
+cd $d
+exec wget -c -t3 $SRC

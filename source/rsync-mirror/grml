@@ -1,0 +1,2 @@
+RSYNC_HOST=ftp.fau.de
+RSYNC_DIR=grml/

@@ -1,0 +1,4 @@
+RSYNC_HOST=mirror.pacific.net.au
+RSYNC_DIR=kernel/linux/
+
+EXCLUDE="--exclude '*.gz' --exclude '*.gz.sign' --exclude /kernel/people/"

@@ -1,0 +1,11 @@
+TO=centos/
+#RSYNC_HOST=msync.centos.org
+#RSYNC_HOST=linux.mirrors.es.net
+#RSYNC_HOST=mirrors.ocf.berkeley.edu
+RSYNC_HOST=mirrors6.tuna.tsinghua.edu.cn
+# IPv4 Connection Reset
+#RSYNC_HOST=mirror.xtom.com.hk
+RSYNC_DIR=centos/
+RSYNC_OPTS="-rltvzH6"
+
+EXCLUDE="--exclude /8-stream/"

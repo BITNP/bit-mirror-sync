@@ -1,0 +1,11 @@
+#RSYNC_HOST=ftp.heanet.ie
+#RSYNC_DIR=mirrors/ubuntu-releases/
+#RSYNC_OPTS="-avH6"
+#RSYNC_HOST=ubuntu.cs.utah.edu
+#RSYNC_DIR=ubuntu-releases/
+RSYNC_HOST=rsync.releases.ubuntu.com
+RSYNC_DIR=releases/
+RSYNC_OPTS="-avH"
+TO=ubuntu-releases
+#WGET_URL=http://ftp.sjtu.edu.cn/ubuntu-cd/
+#WGET_INCLUDE="--exclude '*.html'"

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+~/bin/statusgen > ~/public_html/web/status/status-full.yaml
+
+~/bin/statusgen pass-public < ~/public_html/web/status/status-full.yaml\
+ | ~/bin/yaml2json > ~/public_html/web/status/status.json
+

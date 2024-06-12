@@ -1,0 +1,5 @@
+#RSYNC_HOST=nue.de.rsync.macports.org
+#RSYNC_HOST=centos.ustc.edu.cn
+RSYNC_HOST=mirrors.tuna.tsinghua.edu.cn
+RSYNC_DIR=macports/
+RSYNC_DELETE_EXCLUDE=yes

@@ -1,0 +1,5 @@
+# Testing, not approved by aarnet yet!
+RSYNC_HOST=mirror.aarnet.edu.au
+RSYNC_DIR=pub/oraclelinux/
+EXCLUDE="--exclude 'source/'"
+RSYNC_DELETE_EXCLUDE=yes

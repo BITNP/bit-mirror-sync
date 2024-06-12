@@ -1,0 +1,8 @@
+#!/bin/bash
+
+MIRRORS="apache-dist centos gentoo gentoo-portage cpan ctan ldp mozilla mysql \
+         pgsqlftp putty sourceware vim ubuntu debian debian-security"
+
+for m in $MIRRORS; do
+  ~mirror/bin/rsync-mirror ~mirror/source/$m
+done

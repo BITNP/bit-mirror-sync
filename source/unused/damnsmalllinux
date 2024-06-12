@@ -1,0 +1,3 @@
+RSYNC_HOST=ftp.heanet.ie
+RSYNC_DIR=pub/damnsmalllinux/
+EXCLUDE="--exclude /archive/"

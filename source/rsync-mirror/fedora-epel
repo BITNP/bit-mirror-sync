@@ -1,0 +1,5 @@
+RSYNC_HOST=mirrors.ocf.berkeley.edu
+RSYNC_DIR=fedora-epel/
+TO=fedora/epel/
+EXCLUDE="--exclude ppc/ --exclude ppc64/ --exclude debug/"
+RSYNC_OPTS="-rltvzH6"

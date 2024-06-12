@@ -1,0 +1,5 @@
+#RSYNC_HOST=ftp.ipv6.heanet.ie
+RSYNC_HOST=rsync.jp.gentoo.org
+#RSYNC_DIR=mirrors/gentoo-portage/
+RSYNC_DIR=gentoo-portage/
+TO=gentoo-portage/

@@ -1,0 +1,16 @@
+RSYNC_HOST=mirrors.tuna.tsinghua.edu.cn
+RSYNC_DIR=debian/
+RSYNC_OPTS="-rltzvH6"
+#WGET_URL=http://mirror.dlut.edu.cn/debian/
+#WGET_INCLUDE="--exclude dists/ --exclude doc/ --exclude indices/ --exclude tools/ --exclude project/"
+
+PATTERN="*_\$arch.deb *_\$arch.udeb binary-\$arch/ arch-\$arch.* Contents-\$arch.* Contents-udeb-\$arch.* installer-\$arch/"
+EXCLUDEARCH="alpha hppa hurd-i386 ia64 m68k mipsel mips powerpc s390 sparc s390x"
+
+EXCLUDE="--exclude '/ls-lR.*'"
+for arch in $EXCLUDEARCH ; do
+    for pattern in $PATTERN ; do
+        eval "e=$pattern"
+        EXCLUDE="$EXCLUDE --exclude '$e'"
+    done
+done

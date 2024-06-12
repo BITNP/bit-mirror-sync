@@ -1,0 +1,4 @@
+TO=pentaho/
+RSYNC_HOST=rsync.mirrorservice.org
+RSYNC_DIR=downloads.sourceforge.net/p/pe/pentaho/
+RSYNC_DELETE_EXCLUDE=yes

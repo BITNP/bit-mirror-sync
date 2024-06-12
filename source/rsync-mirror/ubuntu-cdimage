@@ -1,0 +1,9 @@
+#RSYNC_HOST=ftp.heanet.ie
+#RSYNC_DIR=mirrors/ubuntu-cdimage/
+RSYNC_OPTS="-avH"
+#RSYNC_HOST=cdimage.ubuntu.com
+#RSYNC_DIR=cdimage/
+RSYNC_HOST=rsync.mirrors.ustc.edu.cn
+RSYNC_DIR=ubuntu-cdimage/
+#WGET_URL=http://ftp.sjtu.edu.cn/ubuntu-cd/
+#WGET_INCLUDE="--exclude '*.html'"

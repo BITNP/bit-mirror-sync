@@ -1,0 +1,3 @@
+RSYNC_HOST=ftp.uni-kl.de
+RSYNC_DIR=pub/linux/knoppix-dvd/
+EXCLUDE="--exclude '*-DE.iso*' --exclude '/CD'"

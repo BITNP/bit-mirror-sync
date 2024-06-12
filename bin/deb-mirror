@@ -1,0 +1,68 @@
+#!/bin/bash -p
+
+
+function read_config {
+    . $SOURCE
+}
+
+SOURCE=$1
+
+set +e
+
+umask 002
+LOCK="${TO}/Archive-Update-in-Progress-`hostname -f`"
+
+# Check to see if another sync is in progress
+if [ -f $LOCK ]
+then
+  echo `hostname` is unable to start rsync, lock file exists
+  exit 1
+fi
+
+if [ "$DEBMIRROR_GET_CONTENTS" = "yes" ]
+then
+  DEBMIRROR_OPTS="$DEBMIRROR_OPTS --getcontents"
+fi
+
+if [ "$DEBMIRROR_SOURCE" = "yes" ]
+then
+  DEBMIRROR_OPTS="$DEBMIRROR_OPTS --source"
+else
+  DEBMIRROR_OPTS="$DEBMIRROR_OPTS --nosource"
+fi
+
+if [ "$DEBMIRROR_CLEANUP" = "yes" ]
+then
+  DEBMIRROR_OPTS="$DEBMIRROR_OPTS --postcleanup"
+else
+  DEBMIRROR_OPTS="$DEBMIRROR_OPTS --nocleanup"
+fi
+
+if [ -n "$PROXY" ]
+then
+  PROXY="--proxy=$PROXY"
+fi
+
+[ -z "$LOG" ] && LOG=~/log/`basename $1`.log
+
+maxretry=30
+result=1
+while [ $result != 0 -a $maxretry -gt 0 ] ; do
+    read_config
+
+    maxretry=`expr $maxretry - 1`
+
+    CMD="~/bin/debmirror --debug --progress \
+         --ignore-missing-release --ignore-small-errors --ignore-release-gpg \
+         --pdiff=none $PROXY \
+         $DEBMIRROR_OPTS \
+         -h $REMOTE_HOST -d $DISTS -a $ARCH -s $SECTION -r $REMOTE_DIR \
+         $TO >>$LOG 2>&1"
+    [ -n "$LOADER" ] && $CMD="$LOADER $CMD"
+
+    echo "CMD=$CMD" >> $LOG
+    eval $CMD
+    result=$?
+done
+
+savelog $LOG > /dev/null 2>&1

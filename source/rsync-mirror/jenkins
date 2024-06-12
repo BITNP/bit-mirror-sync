@@ -1,0 +1,3 @@
+#RSYNC_HOST=127.0.0.1:1874 #ftp.osuosl.org
+RSYNC_HOST=mirrors.tuna.tsinghua.edu.cn
+RSYNC_DIR=jenkins/

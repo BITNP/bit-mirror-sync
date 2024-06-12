@@ -1,0 +1,6 @@
+RSYNC_HOST=mirrors6.tuna.tsinghua.edu.cn
+# RSYNC_HOST=rsync.mirrors.ustc.edu.cn
+RSYNC_DIR=msys2/
+TO=msys2/
+RSYNC_DELETE_EXCLUDE=yes
+RSYNC_OPTS="-rltzvH6"

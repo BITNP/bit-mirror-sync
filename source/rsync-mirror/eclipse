@@ -1,0 +1,10 @@
+#RSYNC_HOST=ftp.heanet.ie
+#RSYNC_DIR=mirrors/eclipse/
+
+#RSYNC_HOST=mirrors.tuna.tsinghua.edu.cn
+RSYNC_HOST=mirrors.tuna.tsinghua.edu.cn
+RSYNC_DIR=eclipse/
+RSYNC_OPTS="-rltzvH6"
+
+#RSYNC_HOST=ftp.jaist.ac.jp
+#RSYNC_DIR=pub/eclipse/

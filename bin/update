@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+from threading import Thread, Lock
+import os, time, random
+
+mirrors = []
+
+top = "/home/mirror/source/rsync-mirror"
+
+for root, dirs, files in os.walk(top, topdown=False):
+    for name in files:
+    	mirrors.append(['~mirror/bin/rsync-mirror2 %s/%s' % (root, name), 0])
+#mirrors.append('~mirrror/bin/eclipse-rsync')
+
+random.shuffle(mirrors)
+
+channels = 3
+
+mlock = Lock()
+class MirrorThread(Thread):
+
+    def __init__(self, channel):
+        Thread.__init__(self)
+        self.channel = channel
+        self.start_time = time.time()
+
+    def run(self):
+        now = time.time()
+        # 如果当前的时间比开始更新的时间多 16 小时，则退出
+        while (now - self.start_time) < (3600 * 16):
+            source = get_source()
+            if not source: break
+            cmd = "UPDATE_RETRY=1 %s" % source[0]
+            print cmd
+            ret = os.system(cmd)
+            now = time.time()
+            if ret != 0 and source[1] < 3:
+                source[1] = source[1] + 1
+                put_source(source)
+        return
+
+def get_source():
+    global mirrors, mlock
+    ret = None
+    mlock.acquire()
+    if len(mirrors) > 0:
+        ret = mirrors.pop(0)
+    mlock.release()
+    return ret
+
+def put_source(source):
+    global mirrors, mlock
+    mlock.acquire()
+    mirrors.append(source)
+    mlock.release()
+
+threads = []
+for i in range(channels):
+    t = MirrorThread(i)
+    threads.append(t)
+    t.start()
+
+#while t in threads:
+#    t.join()

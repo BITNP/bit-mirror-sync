@@ -1,0 +1,3 @@
+TO=LDP/
+RSYNC_HOST=mirrors.kernel.org
+RSYNC_DIR=LDP/

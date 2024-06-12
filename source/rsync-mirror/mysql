@@ -1,0 +1,7 @@
+#RSYNC_HOST=mysql.he.net
+#RSYNC_HOST=rsync.mirrorservice.org
+#RSYNC_DIR=ftp.mysql.com/
+RSYNC_HOST=mirrors.tuna.tsinghua.edu.cn
+RSYNC_DIR=mysql/
+TO=mysql/
+RSYNC_OPTS="-rltvzH"

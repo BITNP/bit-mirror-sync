@@ -1,0 +1,4 @@
+RSYNC_HOST=ftp.fau.de
+#ftp.heanet.ie
+RSYNC_DIR=putty/
+#mirrors/putty/

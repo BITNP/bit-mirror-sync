@@ -1,0 +1,10 @@
+RSYNC_HOST=ftp.postgresql.org
+RSYNC_DIR=pgsql-ftp/
+TO=postgresql/
+EXCLUDE="--exclude '/binary/**/linux/' \
+         --exclude 'dev/' \
+         --exclude '/stable_snapshot' \
+         --exclude '/snapshot/' \
+         --exclude '/source/**/*tar.gz*'"
+RSYNC_DELETE_EXCLUDE=yes
+RSYNC_OPTS="-rltvzH6"

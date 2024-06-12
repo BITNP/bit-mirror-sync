@@ -1,0 +1,8 @@
+TO=qtproject/
+#RSYNC_HOST=ftp.fau.de
+#RSYNC_HOST=ftp.jaist.ac.jp
+#RSYNC_DIR=pub/qtproject/
+RSYNC_HOST=mirrors.tuna.tsinghua.edu.cn
+RSYNC_DIR=qt/
+RSYNC_DELETE_EXCLUDE=yes
+#RSYNC_OPTS="-rltvzH --ignore-errors"

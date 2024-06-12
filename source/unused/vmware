@@ -1,0 +1,2 @@
+RSYNC_HOST=linux.mirrors.es.net
+RSYNC_DIR=pub/vmware/

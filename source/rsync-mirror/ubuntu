@@ -1,0 +1,20 @@
+#RSYNC_HOST=ftp.heanet.ie
+#RSYNC_HOST=linux.mirrors.es.net
+RSYNC_HOST=ftp.fau.de
+#RSYNC_HOST=mirrors.tuna.tsinghua.edu.cn
+RSYNC_DIR=ubuntu/
+RSYNC_OPTS="-rltzvH6"
+#WGET_URL=http://ftp.sjtu.edu.cn/ubuntu/
+#WGET_URL=http://mirror.dlut.edu.cn/ubuntu/
+#WGET_INCLUDE="--exclude 'dists/' --exclude 'indices/'"
+
+#PATTERN="*_\$arch.deb *_\$arch.udeb binary-\$arch/ arch-\$arch.* Contents-\$arch.* installer-\$arch/"
+#EXCLUDEARCH="powerpc sparc"
+#
+#EXCLUDE="--exclude 'project/'"
+#for arch in $EXCLUDEARCH ; do
+#    for pattern in $PATTERN ; do
+#        eval "e=$pattern"
+#        EXCLUDE="$EXCLUDE --exclude '$e'"
+#    done
+#done

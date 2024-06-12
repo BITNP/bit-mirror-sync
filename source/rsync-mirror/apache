@@ -1,0 +1,5 @@
+#RSYNC_HOST=ftp.heanet.ie
+#RSYNC_DIR=mirrors/www.apache.org/dist/
+RSYNC_OPTS="-avz --safe-links"
+RSYNC_HOST=rsync.apache.org
+RSYNC_DIR=apache-dist/

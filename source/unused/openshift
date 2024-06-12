@@ -1,0 +1,2 @@
+RSYNC_HOST=127.0.0.1:1873 #mirror.oss.maxcdn.com
+RSYNC_DIR=mirrors/openshift/

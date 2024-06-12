@@ -1,0 +1,2 @@
+RSYNC_HOST=rsync.mirrors.dotsrc.org
+RSYNC_DIR=jpackage/

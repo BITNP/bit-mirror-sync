@@ -1,0 +1,5 @@
+#RSYNC_HOST=ftp.heanet.ie
+#RSYNC_DIR=mirrors/cygwin/
+
+RSYNC_HOST=mirrors.tuna.tsinghua.edu.cn
+RSYNC_DIR=cygwin/

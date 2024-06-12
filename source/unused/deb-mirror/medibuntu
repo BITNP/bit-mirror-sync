@@ -1,0 +1,7 @@
+TO=~/public_html/medibuntu/
+REMOTE_HOST=packages.medibuntu.org
+REMOTE_DIR=/
+DISTS=hardy,intrepid
+ARCH=i386,amd64
+SECTION=free,non-free
+DEBMIRROR_OPTS="--method=http"

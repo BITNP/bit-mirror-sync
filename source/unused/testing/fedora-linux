@@ -1,0 +1,7 @@
+RSYNC_HOST=rsync.mirrors.ustc.edu.cn
+RSYNC_DIR=fedora/
+TO=fedora/linux/
+RSYNC_OPTS="-av --delete --existing --ignore-existing"
+
+EXCLUDE="--exclude .rsync.log"
+RSYNC_DELETE_EXCLUDE=yes

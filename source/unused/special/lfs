@@ -1,0 +1,2 @@
+RSYNC_HOST=mirror.averse.net
+RSYNC_DIR=lfs/

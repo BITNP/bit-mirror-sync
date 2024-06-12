@@ -1,0 +1,5 @@
+RSYNC_HOST=rsync.mirrorservice.org
+RSYNC_DIR=download.opensuse.org/
+TO=opensuse/
+RSYNC_DELETE_EXCLUDE=yes
+RSYNC_OPTS="-rltzvH"

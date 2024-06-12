@@ -1,0 +1,2 @@
+RSYNC_HOST=mirrors.ibiblio.org
+RSYNC_DIR=maven2/

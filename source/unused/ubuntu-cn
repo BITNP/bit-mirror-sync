@@ -1,0 +1,3 @@
+RSYNC_HOST=www.ubuntu.org.cn
+RSYNC_DIR=ubuntu-cn/
+EXCLUDE="--exclude dists/dapper/ --exclude dists/feisty/ --exclude dists/gutsy/ --exclude medibuntu/"

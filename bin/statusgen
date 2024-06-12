@@ -1,0 +1,174 @@
+#!/bin/bash
+
+if [[ $1 == "pass-public" ]]; then
+  sed -e '/error_logs:/,/# end_error_logs/d'
+  exit $?
+fi
+
+echo "generated: `date --rfc-3339=seconds`"
+echo "syncing:"
+for f in ~mirror/log/*.log; do
+  name=$(sed -r "s/.+\/(.+)\..+/\1/"<<<"$f")
+  all_dots=${f//[^\.]}
+  [ ${#all_dots} -ne 1 ] && continue
+  [[ $name == rsyncd || $name == update ]] && continue
+  echo "  - name: $name"
+  log_updated=$(stat -c%y $f|sed 's/\(:[0-9]\{2\}\)\.[0-9]* \(.\{3\}\)/\1\2:/')
+  echo "    log_updated: \"$log_updated\""
+  rsync_date=$(grep -n "RSYNC_Started\|RSYNC_Ended" $f)
+  rsync_lines=$(wc -l<<<"$rsync_date")
+  [ ${#rsync_date} -eq 0 ] && rsync_lines=0
+  rsync_lastline=${rsync_date##*$'\n'}
+  echo "    attempts: $(((rsync_lines+1)/2))"
+  last_logs=$(tail $f -n 5) #5
+
+#  rsync_progress=$(tac <<<"$last_logs"|grep "\(xfer.*[[:digit:]]\)" -o -m 1)
+  [[ ${rsync_lastline%%:*} != "" ]] && rsync_progress=$(tail -n "+${rsync_lastline%%:*}" $f|tac|grep "\(xfr.*[[:digit:]]\)" -o -m 1)
+
+  if [[ ${rsync_lastline#*$':'} == RSYNC_Ended* ]]; then
+    echo "    rsync_ended: \"${rsync_lastline#*$' '}\""
+    rsync_last2linetemp=${rsync_date%$'\n'*}
+    rsync_last2line=${rsync_last2linetemp##*$'\n'}
+    if [[ $rsync_last2line != "" ]]; then
+      echo "    rsync_started: \"${rsync_last2line#*$' '}\""
+      rsync_source_line=$(sed "$((${rsync_last2line%%:*}-5))!d" $f)
+      echo "    rsync_source: \"${rsync_source_line:13}\""
+    fi
+
+    if [[ $rsync_progress =~ xfr\#([[:digit:]]+)\,[[:space:]]to-chk\=(.+) ]]; then
+      echo "    rsync_transfered: ${BASH_REMATCH[1]}"
+    fi
+
+    echo "    status: error"
+    echo "    error_logs:"
+    grep -E " failed| error" $f|col -x -b|awk '{gsub("\\", "\\\\"); gsub("\"", "\\\""); print "      - \""$0"\""}'
+    echo "    # end_error_logs"
+    #grep "error" $f|col -x -b|awk '{print "      - \""$0"\""}'
+  else
+    echo "    rsync_started: \"${rsync_lastline#*$' '}\""
+    rsync_source_line=$(sed "$((${rsync_lastline%%:*}-5))!d" $f)
+    echo "    rsync_source: ${rsync_source_line:13}"
+
+    if [[ $(ps ax -o "%a"|grep "^rsync"|grep "${rsync_source_line:13}") ]]; then
+      if [[ $(grep "^deleting " <<<"$last_logs") ]]; then
+        echo "    status: deleting"
+        rsync_deleted=$(col -x -b<<<\"${last_logs##*$'\n'}\")
+        if [[ $rsync_deleted =~ [[:digit:]]+ ]]; then
+          echo "    rsync_deleted: ${BASH_REMATCH[0]}"
+        fi
+      else
+        if [[ $rsync_progress ]]; then
+          echo "    status: updating"
+          if [[ $rsync_progress =~ xfr\#([[:digit:]]+)\,[[:space:]]to-chk\=(.+) ]]; then
+            echo "    rsync_transfered: ${BASH_REMATCH[1]}"
+            echo "    rsync_to_check: \"${BASH_REMATCH[2]}\""
+          else
+            echo "    progress: \"$rsync_progress\""
+          fi
+        else
+          echo "    status: running"
+        fi
+      fi
+    else
+      if [[ $rsync_progress =~ xfr\#([[:digit:]]+)\,[[:space:]]to-chk\=(.+) ]]; then
+        echo "    rsync_transfered: ${BASH_REMATCH[1]}"
+      fi
+
+      echo "    status: error"
+    fi
+    echo "    error_logs:"
+    col -x -b <<<"$last_logs"|awk '{gsub("\\", "\\\\"); gsub("\"", "\\\""); print "      - \""$0"\""}'
+    echo "    # end_error_logs"
+  fi
+  echo ;
+done
+
+echo "previous:"
+for f in ~mirror/log/*.log.0; do
+  name=$(sed -r "s/.+\/([^\.]*)\..+/\1/"<<<"$f")
+  all_dots=${f//[^\.]}
+  [ ${#all_dots} -ne 2 ] && continue
+  [[ $name == rsyncd || $name == update ]] && continue
+  echo "  - name: $name"
+  log_updated=$(stat -c%y $f|sed 's/\(:[0-9]\{2\}\)\.[0-9]* \(.\{3\}\)/\1\2:/')
+  echo "    log_updated: \"$log_updated\""
+  if [[ -f "/home/mirror/log/${name}.tuna" ]]; then
+    echo "    tunaed: true"
+  fi
+  rsync_date=$(grep -n "RSYNC_Started\|RSYNC_Ended" $f)
+  rsync_lines=$(wc -l<<<"$rsync_date")
+  [ ${#rsync_date} -eq 0 ] && rsync_lines=0
+  rsync_lastline=${rsync_date##*$'\n'}
+  echo "    attempts: $(((rsync_lines+1)/2))"
+  last_logs=$(tail $f -n 20) #5
+
+  rsync_size=$(grep -o "total size is [[:digit:]]*"<<<"$last_logs")
+  if [[ $rsync_size =~ is[[:space:]]([[:digit:]]+) ]]; then
+    echo "    rsync_size: ${BASH_REMATCH[1]}"
+    rsync_size=${BASH_REMATCH[1]}
+  fi
+
+  rsync_total_count_line=$(grep -o "Number of files: [[:digit:]]*"<<<"$last_logs")
+  if [[ $rsync_total_count_line != "" ]]; then
+    echo "    rsync_total_count: ${rsync_total_count_line:17}"
+  fi
+
+  rsync_rx_line=$(grep -o "Total bytes received: [[:digit:]]*"<<<"$last_logs")
+  if [[ $rsync_rx_line != "" ]]; then
+    echo "    rsync_rx: ${rsync_rx_line:22}"
+  fi
+
+  [[ ${rsync_lastline%%:*} != "" ]] && rsync_progress=$(tail -n "+${rsync_lastline%%:*}" $f|tac|grep "\(xfer.*[[:digit:]]\)" -o -m 1)
+  if [[ $rsync_progress =~ xfr\#([[:digit:]]+)\,[[:space:]]to-chk\=(.+) ]]; then
+    echo "    rsync_transfered: ${BASH_REMATCH[1]}"
+  fi
+
+  if [[ ${rsync_lastline#*$':'} == RSYNC_Ended* ]]; then
+    # Ended
+    echo "    rsync_ended: \"${rsync_lastline#*$' '}\""
+    rsync_last2linetemp=${rsync_date%$'\n'*}
+    rsync_last2line=${rsync_last2linetemp##*$'\n'}
+    if [[ $rsync_last2line != "" ]]; then
+      echo "    rsync_started: \"${rsync_last2line#*$' '}\""
+      rsync_source_line=$(sed "$((${rsync_last2line%%:*}-5))!d" $f)
+      echo "    rsync_source: \"${rsync_source_line:13}\""
+    fi
+
+    if [[ $rsync_lastline != "" ]]; then
+      rsync_lastline_num=${rsync_lastline%%:*}
+    fi
+
+    out_failed=$(grep -E " failed| error" $f|col -x -b|awk '{gsub("\\", "\\\\"); gsub("\"", "\\\""); print "      - \""$0"\""}')
+    #out_error=$(grep "error" $f|col -x -b|awk '{print "      - \""$0"\""}')
+    if [[ $out_failed == *"-"* ]]; then
+      if [[ $rsync_size != "0" ]]; then
+        echo "    status: warning"
+      else
+        echo "    status: error"
+      fi
+      echo "    error_logs:"
+      echo "${out_failed}"
+      # echo "$out_error"
+      echo "    # end_error_logs"
+    else
+      if [[ $rsync_size != "0" ]]; then
+        echo "    status: completed"
+      else
+        echo "    status: error"
+      fi
+    fi
+  else
+    # Only Started
+    if [[ $rsync_lastline != "" ]]; then
+      echo "    rsync_started: \"${rsync_lastline#*$' '}\""
+      rsync_source_line=$(sed "$((${rsync_lastline%%:*}-5))!d" $f)
+      echo "    rsync_source: \"${rsync_source_line:13}\""
+    fi
+
+    echo "    status: error"
+    echo "    error_logs:"
+    col -x -b <<<"$last_logs"|awk '{gsub("\\", "\\\\"); gsub("\"", "\\\""); print "      - \""$0"\""}'
+    echo "    # end_error_logs"
+  fi
+  echo ;
+done

@@ -1,0 +1,3 @@
+RSYNC_HOST=trumpetti.atm.tut.fi
+RSYNC_DIR=ubuntu-dvd/
+RSYNC_OPTS="-avH6"

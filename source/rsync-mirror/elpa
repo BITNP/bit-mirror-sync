@@ -1,0 +1,3 @@
+TO=elpa/
+RSYNC_HOST=elpa.gnu.org
+RSYNC_DIR=elpa/

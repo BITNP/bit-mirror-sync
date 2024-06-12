@@ -1,0 +1,4 @@
+TO=manjaro-cd/
+RSYNC_HOST=ftp.iij.ad.jp
+RSYNC_DIR=pub/osdn.jp/storage/g/m/ma/manjaro/
+RSYNC_DELETE_EXCLUDE=yes

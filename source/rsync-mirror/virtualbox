@@ -1,0 +1,3 @@
+RSYNC_HOST=mirrors.tuna.tsinghua.edu.cn
+RSYNC_DIR=virtualbox/
+RSYNC_DELETE_EXCLUDE=yes

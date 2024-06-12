@@ -1,0 +1,3 @@
+TO=deepin-cd/
+RSYNC_HOST=rsync.mirrors.ustc.edu.cn
+RSYNC_DIR=releases/

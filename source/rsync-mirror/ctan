@@ -1,0 +1,6 @@
+TO=CTAN/
+#RSYNC_HOST=rsync.dante.ctan.org
+#RSYNC_HOST=ftp.heanet.ie
+#RSYNC_DIR=mirrors/ctan.org/tex/
+RSYNC_HOST=mirrors.rit.edu
+RSYNC_DIR=CTAN/

@@ -1,0 +1,4 @@
+#RSYNC_HOST=ftp.hr.debian.org
+RSYNC_HOST=rsync.mirrors.ustc.edu.cn
+RSYNC_DIR=debian-cd/
+RSYNC_OPTS="-avH"

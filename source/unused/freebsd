@@ -1,0 +1,10 @@
+TO=FreeBSD/
+RSYNC_HOST=ftp.heanet.ie
+RSYNC_DIR=mirrors/FreeBSD/
+RSYNC_OPTS=-av
+
+EXCLUDE="--exclude '**/*alpha*' --exclude '**/*powerpc*' \
+         --exclude '**/*sparc64*' --exclude '**/*ia64*' \
+         --exclude '**/*pc98*' --exclude '**/*sun4v*' \
+         --exclude '**/packages-5*' --exclude '**/packages-6*' \
+         --exclude '/snapshots' --exclude '/doc/mailing-lists' "

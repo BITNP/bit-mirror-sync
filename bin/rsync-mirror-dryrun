@@ -1,0 +1,184 @@
+#! /bin/bash -p
+set -e
+
+# Set the variables below to fit your site. You can then use cron to have this
+# script run daily to automatically update your copy of the archive
+#
+# TO is the destination for the base of the debian directory (the dir that
+# holds dists/ and ls-lR)
+#
+# RSYNC_HOST is the site you have chosen from the mirrors file
+#
+# RSYNC_DIR is the directory given in the Archive-rsync: line of the
+# mirrors file for the site you have chosen to mirror.
+#
+# EXCLUDE is the files should not be includede in rsync process
+#
+# TO is the directory where the archive stored
+#
+# RSYNC_LOG is the place where log of the rsync program should be written to
+#
+# You MUST have rsync 2.0.16-1 or newer which is available in slink
+
+# 读取镜像配置文件
+function read_config {
+
+    # 首先设定所有变量的缺省值
+    TO="$SOURCENAME/"
+    RSYNC_LOG="$HOME/log/$SOURCENAME.dryrun.log"
+    WGET_LIST="$HOME/log/$SOURCENAME.wget"
+    WGET_CUT_DIRS="1"
+    RSYNC_OPTS="-rltvzH"
+    RSYNC_DELETE_EXCLUDE=no
+
+    . $SOURCE
+
+    TO="$HOME/public_html/$TO"
+    LOCK="${TO}Archive-Listing-in-Progress-`hostname -f`"
+
+    if [ "$RSYNC_DELETE_EXCLUDE" = "yes" ] ; then
+      RSYNC_OPTS="$RSYNC_OPTS --delete-excluded"
+    fi
+
+    if [ -n "$UPDATE_PROXY" ] ; then
+        RSYNC_PROXY=$UPDATE_PROXY
+    fi
+
+    if [ -n "$RSYNC_PROXY" ] ; then
+      export RSYNC_PROXY
+    fi
+
+    if [ -n "$TSOCKS_CONF_FILE" ] ; then
+      export TSOCKS_CONF_FILE
+    fi
+}
+
+function quit {
+    quitnow=1
+    kill $pid
+}
+
+function rsync_mirror {
+    # 设定在不成功时的尝试次数，缺省为 30 次，
+    # 可通过环境变量 UPDATE_RETRY 设定
+    local maxtry=$1
+    local fetchlist=$2
+
+    [ -n "$UPDATE_RETRY" ] && maxtry=$UPDATE_RETRY
+
+    # 当用户按 Ctrl-\ 时退出
+    trap quit SIGQUIT
+    quitnow=0
+    result=1
+    while [ $quitnow -eq 0 -a $result -ne 0 \
+            -a $result -ne 23 -a $maxtry -gt 0 ] ;
+    do
+        # 每次执行前都读取一次配置信息
+        read_config
+
+        [ -n "$SKIP" ] && exit 0
+        if [ $fetchlist -eq 1 ] ; then
+            RSYNC_OPTS="$RSYNC_OPTS --dry-run -i --stats --delete --delete-after $EXCLUDE $WGET_INCLUDE"
+        else
+            RSYNC_OPTS="$RSYNC_OPTS --stats -P -H --chmod '+r,u+w,g-w,o-w' --delete --delete-after $EXCLUDE"
+        fi
+
+        maxtry=$(expr $maxtry '-' '1')
+
+        CMD="rsync $RSYNC_OPTS --delay-updates --timeout=300 \
+             --exclude Archive-Update-in-Progress-`hostname -f` \
+             rsync://$RSYNC_HOST/$RSYNC_DIR $TO"
+        [ $fetchlist -eq 0 ] && CMD="$CMD >> $RSYNC_LOG 2>&1 &"
+        [ -n "$LOADER" ] && CMD="$LOADER $CMD"
+
+        echo "RSYNC_SOURCE=rsync://$RSYNC_HOST/$RSYNC_DIR" >> $RSYNC_LOG
+        echo "RSYNC_TARGET=$TO" >> $RSYNC_LOG
+        echo "RSYNC_EXCLUDE=$EXCLUDE" >> $RSYNC_LOG
+        echo "RSYNC_PROXY=$RSYNC_PROXY" >> $RSYNC_LOG
+        echo "COMMAND=$CMD" >> $RSYNC_LOG
+
+        # 启动程序，当用户按 Ctrl-C 时，中断 rsync 程序
+        if [ $fetchlist -eq 0 ] ; then
+            eval "$CMD"
+            pid=$!
+            trap "kill $pid" SIGINT
+            wait $pid
+            result=$?
+
+            #echo "result: $result" >> $RSYNC_LOG
+            if [ "$result" -ne 0 -a "$result" -ne 23 ] ; then
+                echo "Failed with return value $result" >> $RSYNC_LOG
+                [ $maxtry -gt 0 -a $quitnow -eq 0 ] && sleep 5
+            fi
+       else
+            eval "$CMD | tee -a $RSYNC_LOG > $WGET_LIST"
+       fi
+    done
+}
+
+function wget_mirror {
+    rsync_mirror 1 1
+
+    mv $WGET_LIST $WGET_LIST.0
+    for line in `grep -v ' ' $WGET_LIST.0 | grep -v '/$' | grep '/'`
+    do
+        echo $WGET_URL$line >> $WGET_LIST
+    done
+
+    CMD="wget -r -nH --no-http-keep-alive -w 1 --progress=bar:force --read-timeout=15 --cut-dirs=$WGET_CUT_DIRS -c -t3 -i $WGET_LIST -P $TO >> $RSYNC_LOG 2>&1"
+    echo $CMD >> $RSYNC_LOG
+
+    local retry=3
+    local result=1
+    while [ $result -ne 0 -a $retry -gt 0 ] ;
+    do
+        retry=$(expr $retry '-' '1')
+        eval "$CMD"
+        result=$?
+        if [ $result -ne 0 ] ; then
+            echo "wget failed with return value $result"
+        fi
+    done
+
+}
+
+# 命令行的第一个参数为配置文件名称
+# 将 SOURCE 变量设定为配置文件的绝对路径，
+# 将 SOURCENAME 变量设置为配置文件的文件名（不含路径）
+SOURCE=$1
+if [ -n "$SOURCE" ]; then
+  if [ ! `expr match "$SOURCE" '/'` ] ; then
+    SOURCE=`pwd`/$SOURCE
+  fi
+else
+  echo "Usage: rsync-mirror sourceconfig"
+  exit 1
+fi
+SOURCENAME=`basename $1`
+
+# 设定 HOME 目录，并将生成的文件设定为只有 mirror 用户可写
+HOME=~mirror
+cd $HOME
+umask 022
+
+# 读取配置信息
+read_config
+
+# 检查 LOCK 文件，以确定是否有其它的进程正在运行
+# 若 LOCK 文件的生成时间在 72 小时之内，则退出
+if lockfile -! -l 259200 -r 0 "$LOCK"; then
+  echo `hostname` is unable to start rsync, lock file exists
+  exit 0
+fi
+# 程序退出时删除 LOCK 文件
+trap "rm -f $LOCK > /dev/null 2>&1" exit
+
+set +e
+result=0
+#[ -n "$WGET_URL" ] && wget_mirror
+rsync_mirror 1 1
+
+# echo "Disk space used: `du -s -B1 $TO`" >> $RSYNC_LOG
+
+[ $result -eq 0 -o "$result" -eq 23 ] && savelog $RSYNC_LOG > /dev/null 2>&1
+exit $result

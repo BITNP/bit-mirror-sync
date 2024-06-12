@@ -1,0 +1,2 @@
+RSYNC_HOST=rsync.delorie.com
+RSYNC_DIR=djgpp/current/

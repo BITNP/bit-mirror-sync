@@ -1,0 +1,3 @@
+TO=rubyforge/gems/
+RSYNC_HOST=master.mirror.rubyforge.org
+RSYNC_DIR=gems/

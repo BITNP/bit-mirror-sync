@@ -1,0 +1,2 @@
+RSYNC_HOST=ftp.nluug.nl
+RSYNC_DIR=RFC/

@@ -1,0 +1,9 @@
+TO=manjaro/
+#RSYNC_HOST=linux.mirrors.es.net
+RSYNC_HOST=mirrors.ocf.berkeley.edu
+#RSYNC_HOST=mirrors.bfsu.edu.cn
+# IPv4 Connection Reset
+#RSYNC_HOST=mirror.xtom.com.hk
+RSYNC_DIR=manjaro/
+RSYNC_OPTS="-rltvzH6"
+

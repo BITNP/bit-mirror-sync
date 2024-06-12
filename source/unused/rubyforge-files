@@ -1,0 +1,4 @@
+TO=rubyforge/files/
+RSYNC_HOST=master.mirror.rubyforge.org
+RSYNC_DIR=files/
+SKIP=1

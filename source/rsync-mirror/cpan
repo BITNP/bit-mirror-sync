@@ -1,0 +1,7 @@
+# Testing, not approved by aarnet yet!
+TO=CPAN/
+#RSYNC_HOST=linux.mirrors.es.net
+RSYNC_HOST=mirror.aarnet.edu.au
+RSYNC_DIR=pub/CPAN/
+#RSYNC_HOST=ftp3.ie.freebsd.org
+#RSYNC_DIR=pub/CPAN/
